@@ -18,6 +18,8 @@ except ImportError:
 # Changed from 9877 to 9878 to avoid conflict with another tool I run locally
 DEFAULT_PORT = 9878
 HOST = "localhost"
+# Max number of pending connections - increased from 5 to allow more simultaneous clients
+MAX_PENDING_CONNECTIONS = 10
 
 def create_instance(c_instance):
     """Create and return the AbletonMCP script instance"""
@@ -79,13 +81,11 @@ class AbletonMCP(ControlSurface):
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server.bind((HOST, DEFAULT_PORT))
-            self.server.listen(5)  # Allow up to 5 pending connections
+            self.server.listen(MAX_PENDING_CONNECTIONS)
             
             self.running = True
             self.server_thread = threading.Thread(target=self._server_thread)
             self.server_thread.daemon = True
             self.server_thread.start()
             
-            self.log_message("Server started on port " + str(DEFAULT_PORT))
-        except Exception as e:
-            self.log
+            self.log_message("Server started on p

@@ -71,6 +71,8 @@ def set_track_volume(track_index: int, volume: float) -> Dict[str, Any]:
     Args:
         track_index: Zero-based index of the track.
         volume: Volume as a linear gain value (0.0 – 1.0).
+            Note: Ableton's default fader position (unity gain) is ~0.85,
+            not 1.0. Keep this in mind when scripting volume resets.
     """
     if not (0.0 <= volume <= 1.0):
         raise ValueError(f"Volume must be between 0.0 and 1.0, got {volume}")
@@ -92,71 +94,3 @@ def set_track_pan(track_index: int, pan: float) -> Dict[str, Any]:
 def set_track_mute(track_index: int, muted: bool) -> Dict[str, Any]:
     """Mute or un-mute a track."""
     return _cmd("set_track_mute", {"track_index": track_index, "muted": muted})
-
-
-def set_track_solo(track_index: int, soloed: bool) -> Dict[str, Any]:
-    """Solo or un-solo a track."""
-    return _cmd("set_track_solo", {"track_index": track_index, "soloed": soloed})
-
-
-# ---------------------------------------------------------------------------
-# Clips
-# ---------------------------------------------------------------------------
-
-def get_clip_info(track_index: int, clip_index: int) -> Dict[str, Any]:
-    """Request info for a specific clip slot.
-
-    Args:
-        track_index: Zero-based track index.
-        clip_index: Zero-based clip slot index.
-    """
-    return _cmd("get_clip_info", {"track_index": track_index, "clip_index": clip_index})
-
-
-def fire_clip(track_index: int, clip_index: int) -> Dict[str, Any]:
-    """Launch a clip."""
-    return _cmd("fire_clip", {"track_index": track_index, "clip_index": clip_index})
-
-
-def stop_clip(track_index: int, clip_index: int) -> Dict[str, Any]:
-    """Stop a playing clip."""
-    return _cmd("stop_clip", {"track_index": track_index, "clip_index": clip_index})
-
-
-# ---------------------------------------------------------------------------
-# Devices / Parameters
-# ---------------------------------------------------------------------------
-
-def get_device_parameters(track_index: int, device_index: int) -> Dict[str, Any]:
-    """Request all parameters for a device on a track.
-
-    Args:
-        track_index: Zero-based track index.
-        device_index: Zero-based device index on that track.
-    """
-    return _cmd(
-        "get_device_parameters",
-        {"track_index": track_index, "device_index": device_index},
-    )
-
-
-def set_device_parameter(
-    track_index: int, device_index: int, parameter_index: int, value: float
-) -> Dict[str, Any]:
-    """Set a single device parameter value.
-
-    Args:
-        track_index: Zero-based track index.
-        device_index: Zero-based device index.
-        parameter_index: Zero-based parameter index within the device.
-        value: Normalised parameter value (0.0 – 1.0).
-    """
-    return _cmd(
-        "set_device_parameter",
-        {
-            "track_index": track_index,
-            "device_index": device_index,
-            "parameter_index": parameter_index,
-            "value": value,
-        },
-    )

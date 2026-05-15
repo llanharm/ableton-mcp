@@ -21,6 +21,11 @@ HOST = "localhost"
 # Max number of pending connections - increased from 5 to allow more simultaneous clients
 MAX_PENDING_CONNECTIONS = 10
 
+# Timeout (in seconds) for blocking socket operations.
+# Keeping this short so the server thread can check self.running frequently
+# and shut down cleanly without hanging on accept().
+SERVER_ACCEPT_TIMEOUT = 0.5
+
 def create_instance(c_instance):
     """Create and return the AbletonMCP script instance"""
     return AbletonMCP(c_instance)
@@ -82,10 +87,9 @@ class AbletonMCP(ControlSurface):
             self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server.bind((HOST, DEFAULT_PORT))
             self.server.listen(MAX_PENDING_CONNECTIONS)
+            # Set a timeout so the accept loop can periodically check self.running
+            self.server.settimeout(SERVER_ACCEPT_TIMEOUT)
             
             self.running = True
             self.server_thread = threading.Thread(target=self._server_thread)
             self.server_thread.daemon = True
-            self.server_thread.start()
-            
-            self.log_message("Server started on p

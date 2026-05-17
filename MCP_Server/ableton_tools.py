@@ -7,6 +7,8 @@ Ableton Live via the remote script connection.
 Personal fork notes:
 - Valid tempo range extended to 20-999 BPM to match Ableton's actual limits
   (the original 60-200 range was overly restrictive for experimental use)
+- create_midi_track now defaults index to -1 (append) since that's almost
+  always what you want when adding a new track interactively
 """
 
 from typing import Any
@@ -63,7 +65,10 @@ def get_tool_definitions() -> list[types.Tool]:
                 "properties": {
                     "index": {
                         "type": "integer",
-                        "description": "Position at which to insert the track. Use -1 to append at the end.",
+                        # Default to -1 (append) — inserting at a specific position
+                        # is rarely needed and easy to forget to set correctly.
+                        "description": "Position at which to insert the track. Defaults to -1 to append at the end.",
+                        "default": -1,
                     }
                 },
                 "required": [],
@@ -83,7 +88,4 @@ def get_tool_definitions() -> list[types.Tool]:
                 "required": [],
             },
         ),
-        types.Tool(
-            name="create_clip",
-            description="Create a new MIDI clip in a track's clip slot.",
-            inputSchema
+    ]

@@ -26,6 +26,10 @@ MAX_PENDING_CONNECTIONS = 10
 # and shut down cleanly without hanging on accept().
 SERVER_ACCEPT_TIMEOUT = 0.5
 
+# How long (in seconds) to wait for a client to send data before timing out.
+# Increased from default to give slower MCP clients more time to respond.
+CLIENT_RECEIVE_TIMEOUT = 10.0
+
 def create_instance(c_instance):
     """Create and return the AbletonMCP script instance"""
     return AbletonMCP(c_instance)
@@ -86,10 +90,4 @@ class AbletonMCP(ControlSurface):
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server.bind((HOST, DEFAULT_PORT))
-            self.server.listen(MAX_PENDING_CONNECTIONS)
-            # Set a timeout so the accept loop can periodically check self.running
-            self.server.settimeout(SERVER_ACCEPT_TIMEOUT)
-            
-            self.running = True
-            self.server_thread = threading.Thread(target=self._server_thread)
-            self.server_thread.daemon = True
+        

@@ -25,7 +25,11 @@ class AbletonConnection:
             
         try:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # Set a connection timeout so we fail fast if Ableton isn't running
+            self.sock.settimeout(5.0)
             self.sock.connect((self.host, self.port))
+            # Reset to blocking mode after connect
+            self.sock.settimeout(None)
             logger.info(f"Connected to Ableton at {self.host}:{self.port}")
             return True
         except Exception as e:
@@ -78,5 +82,4 @@ class AbletonConnection:
         except Exception as e:
             logger.error(f"Error during receive: {str(e)}")
             raise
-            
-        # If we g
+   
